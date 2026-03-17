@@ -75,34 +75,9 @@ jobs:
             exit 1
           fi
 
-      - name: Upload to web server
-        run: |
-          echo "${{ secrets.SSH_RSYNC_SECRET_KEY }}" > identity
-          chmod 600 identity
-
-          mkdir -p "${HOME}"/.ssh
-          echo "${{ secrets.SSH_RSYNC_KNOWN_HOSTS }}" > "${HOME}"/.ssh/known_hosts
-          chmod 600 "${HOME}"/.ssh/known_hosts
-
-          rsync -e "ssh -p ${{ secrets.SSH_RSYNC_PORT }} -i ./identity" \
-            -rvt --include "*-pd-*.tar.xz" --exclude "*" \
-            ./rootfs/ \
-            "${{ secrets.SSH_RSYNC_USERNAME }}@${{ secrets.SSH_RSYNC_IP }}":/
-
-
-      - name: Commit plugin update
-        run: |
-          git config user.name "Termux Github Actions"
-          git config user.email "contact@termux.dev"
-
-          echo "--------------------------------"
-          echo "Git status"
-          echo "--------------------------------"
-          git status
-          echo "--------------------------------"
-
-          git add ./distro-plugins/*.sh
-          git commit -m "[skip ci] update plugin scripts"
-
-          git pull --rebase
-          git push
+      - name: Upload to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rootfs
+          path: ./rootfs/*-pd-*.tar.xz
+          if-no-files-found: error
