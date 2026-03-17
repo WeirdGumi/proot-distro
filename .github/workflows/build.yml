@@ -5,14 +5,6 @@ run-name: >
   || format('Build rootfs: {0}', github.event.inputs.distributions) }}
 
 on:
-  #push:
-  #  branches:
-  #    - master
-  #  paths:
-  #    - 'distro-build/**'
-  #pull_request:
-  #  paths:
-  #    - 'distro-build/**'
   workflow_dispatch:
     inputs:
       distributions:
@@ -76,6 +68,12 @@ jobs:
           done
           ./bootstrap-rootfs.sh ${distros_to_be_built}
 
+      - name: Check
+        run: |
+          if [ -z "$(find ./rootfs/ -mindepth 1 -type f -print -quit)" ]; then
+            echo "No tarballs in ./rootfs/ directory"
+            exit 1
+          fi
 
       - name: Upload to web server
         run: |
