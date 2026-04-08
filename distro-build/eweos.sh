@@ -22,6 +22,7 @@ bootstrap_distribution() {
 		mount --bind /proc "${WORKDIR}/eweos-$(translate_arch "$arch")/proc"
 		mount --bind /sys "${WORKDIR}/eweos-$(translate_arch "$arch")/sys"
 		chroot "${WORKDIR}/eweos-$(translate_arch "$arch")" pacman -Syu --noconfirm
+		chroot "${WORKDIR}/eweos-$(translate_arch "$arch")" pacman -S --noconfirm strace
 		sed -i '/^\[options\]/a DisableSandbox' "${WORKDIR}/eweos-$(translate_arch "$arch")/etc/pacman.conf"
 		EOF
 
